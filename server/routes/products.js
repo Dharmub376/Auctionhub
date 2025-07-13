@@ -24,7 +24,7 @@ router.post('/', [
   try {
     console.log('Creating product with data:', req.body);
     console.log('Files received:', req.files?.length || 0);
-    
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log('Validation errors:', errors.array());
@@ -36,7 +36,7 @@ router.post('/', [
     }
 
     const { name, description, startingBid, auctionEndTime } = req.body;
-    
+
     // Validate auction end time is in the future
     const endTime = new Date(auctionEndTime);
     if (endTime <= new Date()) {
@@ -51,10 +51,10 @@ router.post('/', [
     if (req.files && req.files.length > 0) {
       try {
         // Check if Cloudinary is configured
-        const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
-                                     process.env.CLOUDINARY_API_KEY && 
-                                     process.env.CLOUDINARY_API_SECRET;
-        
+        const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME &&
+          process.env.CLOUDINARY_API_KEY &&
+          process.env.CLOUDINARY_API_SECRET;
+
         if (isCloudinaryConfigured) {
           // Process Cloudinary images
           images = req.files
@@ -100,7 +100,7 @@ router.post('/', [
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     console.error('Error object:', error);
-    
+
     res.status(500).json({
       success: false,
       message: error.message || 'Server error creating product',
@@ -116,10 +116,10 @@ router.get('/', async (req, res) => {
   try {
     console.log('Fetching products...');
     const { page = 1, limit = 10, active = 'true' } = req.query;
-    
+
     const query = active === 'true' ? { isActive: true } : {};
     console.log('Query:', query);
-    
+
     const products = await Product.find(query)
       .populate('seller', 'name email')
       .populate('winner', 'name email')
@@ -128,7 +128,7 @@ router.get('/', async (req, res) => {
       .skip((page - 1) * limit);
 
     const total = await Product.countDocuments(query);
-    
+
     console.log(`Found ${products.length} products out of ${total} total`);
 
     res.json({
@@ -159,7 +159,7 @@ router.get('/', async (req, res) => {
 router.get('/my-products', [authenticate, authorize('seller')], async (req, res) => {
   try {
     console.log('Fetching products for seller:', req.user._id);
-    
+
     const products = await Product.find({ seller: req.user._id })
       .populate('winner', 'name email')
       .sort({ createdAt: -1 });
@@ -223,7 +223,7 @@ router.get('/:id', async (req, res) => {
 router.delete('/:id/image/:imageId', [authenticate, authorize('seller')], async (req, res) => {
   try {
     const { id, imageId } = req.params;
-    
+
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
@@ -250,12 +250,12 @@ router.delete('/:id/image/:imageId', [authenticate, authorize('seller')], async 
     }
 
     const imageToDelete = product.images[imageIndex];
-    
+
     // Delete from Cloudinary if configured
-    const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
-                                 process.env.CLOUDINARY_API_KEY && 
-                                 process.env.CLOUDINARY_API_SECRET;
-    
+    const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET;
+
     if (isCloudinaryConfigured && imageToDelete.publicId) {
       try {
         await cloudinary.uploader.destroy(imageToDelete.publicId);
@@ -264,7 +264,7 @@ router.delete('/:id/image/:imageId', [authenticate, authorize('seller')], async 
         // Continue with database deletion even if Cloudinary fails
       }
     }
-    
+
     // Remove from product
     product.images.splice(imageIndex, 1);
     await product.save();

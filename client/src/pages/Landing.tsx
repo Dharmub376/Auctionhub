@@ -28,19 +28,19 @@ const Landing: React.FC = () => {
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      role: 'Art Collector',
+      name: 'Prashant Paudel',
+      role: 'Antique Seller',
       content: 'Found amazing pieces at great prices. The platform is intuitive and secure.',
       rating: 5
     },
     {
-      name: 'Mike Chen',
-      role: 'Small Business Owner',
-      content: 'Sold my vintage electronics collection quickly. Great seller tools!',
+      name: 'Dharmu Bhusal',
+      role: 'Regular Buyer',
+      content: 'Buy vintage electronics collection quickly. Great buyer tools!',
       rating: 5
     },
     {
-      name: 'Emily Davis',
+      name: 'Nirmal Dhakal',
       role: 'Antique Dealer',
       content: 'Best auction platform I\'ve used. Real-time bidding works flawlessly.',
       rating: 5
